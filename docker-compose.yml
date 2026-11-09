@@ -1,0 +1,23 @@
+name: coursehub
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: coursehub-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-coursehub}
+      POSTGRES_USER: ${DB_USERNAME:-coursehub}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-coursehub}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - coursehub-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-coursehub} -d ${DB_NAME:-coursehub}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  coursehub-pgdata:
