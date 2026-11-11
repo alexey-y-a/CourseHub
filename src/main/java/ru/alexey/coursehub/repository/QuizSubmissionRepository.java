@@ -16,6 +16,8 @@ public interface QuizSubmissionRepository extends JpaRepository<QuizSubmission, 
 
     boolean existsByQuizIdAndStudentId(Long quizId, Long studentId);
 
+    boolean existsByStudentId(Long studentId);
+
     long countByQuizId(Long quizId);
 
     long countByStudentId(Long studentId);

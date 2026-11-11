@@ -18,6 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Page<User> findByRole(Role role, Pageable pageable);
 
+    Page<User> findByRoleAndNameContainingIgnoreCase(Role role, String name, Pageable pageable);
+
     @Query("select u from User u where lower(u.name) like lower(concat('%', :text, '%'))")
     Page<User> searchByName(@Param("text") String text, Pageable pageable);
 
