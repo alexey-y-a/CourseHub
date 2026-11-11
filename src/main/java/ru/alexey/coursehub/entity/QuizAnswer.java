@@ -7,7 +7,6 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,11 +17,10 @@ import lombok.Setter;
 @Entity
 @Table(
         name = "quiz_answers",
-        uniqueConstraints =
-                @UniqueConstraint(
-                        name = "uk_quiz_answers_submission_question",
-                        columnNames = {"quiz_submission_id", "question_id"}),
-        indexes = @Index(name = "idx_quiz_answers_option", columnList = "selected_option_id"))
+        indexes = {
+            @Index(name = "idx_quiz_answers_submission", columnList = "quiz_submission_id"),
+            @Index(name = "idx_quiz_answers_option", columnList = "selected_option_id")
+        })
 public class QuizAnswer extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
