@@ -31,6 +31,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     long countByTeacherId(Long teacherId);
 
+    boolean existsByTeacherId(Long teacherId);
+
     @Query("select c from Course c join fetch c.modules where c.id = :id")
     Optional<Course> findByIdWithModules(@Param("id") Long id);
 
@@ -40,4 +42,18 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             where m.id = :moduleId
             """)
     Optional<Course> findByModuleId(@Param("moduleId") Long moduleId);
+
+    @EntityGraph(attributePaths = {"category", "teacher"})
+    @Query("""
+            select c from Course c
+            where (:categoryId is null or c.category.id = :categoryId)
+              and (:teacherId is null or c.teacher.id = :teacherId)
+              and (cast(:title as string) is null
+                   or lower(c.title) like lower(concat('%', cast(:title as string), '%')))
+            """)
+    Page<Course> search(
+            @Param("categoryId") Long categoryId,
+            @Param("teacherId") Long teacherId,
+            @Param("title") String title,
+            Pageable pageable);
 }

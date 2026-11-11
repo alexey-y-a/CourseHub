@@ -16,6 +16,8 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
     boolean existsByAssignmentIdAndStudentId(Long assignmentId, Long studentId);
 
+    boolean existsByStudentId(Long studentId);
+
     @EntityGraph(attributePaths = {"student"})
     List<Submission> findByAssignmentId(Long assignmentId);
 
