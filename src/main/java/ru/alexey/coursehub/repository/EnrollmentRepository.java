@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,13 +23,15 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     List<Enrollment> findByCourseId(Long courseId);
 
-    Page<Enrollment> findByStudentId(Long studentId, Pageable pageable);
-
-    Page<Enrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status, Pageable pageable);
-
     long countByCourseId(Long courseId);
 
     long countByStudentId(Long studentId);
+
+    @EntityGraph(attributePaths = {"course", "course.category", "course.teacher"})
+    Page<Enrollment> findByStudentId(Long studentId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"course", "course.category", "course.teacher"})
+    Page<Enrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status, Pageable pageable);
 
     @Query("select e from Enrollment e join fetch e.student s where e.course.id = :courseId")
     List<Enrollment> findByCourseIdWithStudents(@Param("courseId") Long courseId);
