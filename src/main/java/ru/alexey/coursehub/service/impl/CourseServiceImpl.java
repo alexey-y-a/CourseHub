@@ -1,6 +1,7 @@
 package ru.alexey.coursehub.service.impl;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,7 +99,9 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional(readOnly = true)
     public Course get(Long id) {
-        return courseRepository.findByIdWithDetails(id).orElseThrow(() -> NotFoundException.of("Course", id));
+        Course course = courseRepository.findByIdWithDetails(id).orElseThrow(() -> NotFoundException.of("Course", id));
+        course.getTags().size();
+        return course;
     }
 
     @Override
@@ -114,6 +117,24 @@ public class CourseServiceImpl implements CourseService {
     public Page<Course> list(Long categoryId, Long teacherId, String title, Pageable pageable) {
         String text = StringUtils.hasText(title) ? title.trim() : null;
         return courseRepository.search(categoryId, teacherId, text, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Module> listModules(Long courseId) {
+        if (!courseRepository.existsById(courseId)) {
+            throw NotFoundException.of("Course", courseId);
+        }
+        return moduleRepository.findByCourseIdOrderByOrderIndexAsc(courseId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Lesson> listLessons(Long moduleId) {
+        if (!moduleRepository.existsById(moduleId)) {
+            throw NotFoundException.of("Module", moduleId);
+        }
+        return lessonRepository.findByModuleIdOrderByIdAsc(moduleId);
     }
 
     @Override

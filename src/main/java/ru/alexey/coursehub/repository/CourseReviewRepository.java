@@ -12,10 +12,10 @@ import ru.alexey.coursehub.entity.CourseReview;
 
 public interface CourseReviewRepository extends JpaRepository<CourseReview, Long> {
 
-    @EntityGraph(attributePaths = {"student"})
+    @EntityGraph(attributePaths = {"student", "course"})
     List<CourseReview> findByCourseIdOrderByCreatedAtDesc(Long courseId);
 
-    @EntityGraph(attributePaths = {"student"})
+    @EntityGraph(attributePaths = {"student", "course"})
     Page<CourseReview> findByCourseId(Long courseId, Pageable pageable);
 
     Optional<CourseReview> findByCourseIdAndStudentId(Long courseId, Long studentId);

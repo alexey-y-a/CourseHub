@@ -27,13 +27,18 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     long countByStudentId(Long studentId);
 
-    @EntityGraph(attributePaths = {"course", "course.category", "course.teacher"})
+    @EntityGraph(attributePaths = {"course", "course.category", "course.teacher", "student"})
     Page<Enrollment> findByStudentId(Long studentId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"course", "course.category", "course.teacher"})
+    @EntityGraph(attributePaths = {"course", "course.category", "course.teacher", "student"})
     Page<Enrollment> findByStudentIdAndStatus(Long studentId, EnrollmentStatus status, Pageable pageable);
 
-    @Query("select e from Enrollment e join fetch e.student s where e.course.id = :courseId")
+    @Query("""
+            select e from Enrollment e
+            join fetch e.student
+            join fetch e.course c
+            where c.id = :courseId
+            """)
     List<Enrollment> findByCourseIdWithStudents(@Param("courseId") Long courseId);
 
     @Query("""
@@ -41,6 +46,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
             join fetch e.course c
             join fetch c.category
             join fetch c.teacher
+            join fetch e.student
             where e.student.id = :studentId
             """)
     List<Enrollment> findByStudentIdWithCourse(@Param("studentId") Long studentId);

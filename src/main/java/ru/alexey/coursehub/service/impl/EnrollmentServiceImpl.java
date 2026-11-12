@@ -57,7 +57,11 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @Transactional(readOnly = true)
     public Enrollment get(Long id) {
-        return enrollmentRepository.findById(id).orElseThrow(() -> NotFoundException.of("Enrollment", id));
+        Enrollment enrollment =
+                enrollmentRepository.findById(id).orElseThrow(() -> NotFoundException.of("Enrollment", id));
+        enrollment.getCourse().getTitle();
+        enrollment.getStudent().getName();
+        return enrollment;
     }
 
     @Override

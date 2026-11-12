@@ -10,6 +10,7 @@ import ru.alexey.coursehub.entity.QuizSubmission;
 
 public interface QuizSubmissionRepository extends JpaRepository<QuizSubmission, Long> {
 
+    @EntityGraph(attributePaths = {"quiz", "student"})
     List<QuizSubmission> findByStudentIdOrderByTakenAtDesc(Long studentId);
 
     List<QuizSubmission> findByQuizId(Long quizId);
@@ -30,6 +31,7 @@ public interface QuizSubmissionRepository extends JpaRepository<QuizSubmission, 
             select qs from QuizSubmission qs
             join fetch qs.quiz q
             join fetch q.module m
+            join fetch qs.student
             where m.course.id = :courseId
             """)
     List<QuizSubmission> findByCourseId(@Param("courseId") Long courseId);
