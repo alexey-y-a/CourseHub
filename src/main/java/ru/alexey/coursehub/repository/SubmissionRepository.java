@@ -18,10 +18,15 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
 
     boolean existsByStudentId(Long studentId);
 
-    @EntityGraph(attributePaths = {"student"})
-    List<Submission> findByAssignmentId(Long assignmentId);
+    @Query("""
+            select s from Submission s
+            join fetch s.student
+            join fetch s.assignment
+            where s.assignment.id = :assignmentId
+            """)
+    List<Submission> findByAssignmentId(@Param("assignmentId") Long assignmentId);
 
-    @EntityGraph(attributePaths = {"assignment"})
+    @EntityGraph(attributePaths = {"assignment", "student"})
     Page<Submission> findByStudentId(Long studentId, Pageable pageable);
 
     long countByAssignmentId(Long assignmentId);
@@ -33,6 +38,7 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
             select s from Submission s
             join fetch s.assignment a
             join fetch a.lesson l
+            join fetch s.student
             where s.student.id = :studentId and l.module.course.id = :courseId
             """)
     List<Submission> findByStudentAndCourse(@Param("studentId") Long studentId, @Param("courseId") Long courseId);

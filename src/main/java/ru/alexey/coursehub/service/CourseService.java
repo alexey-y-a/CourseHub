@@ -1,5 +1,6 @@
 package ru.alexey.coursehub.service;
 
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.alexey.coursehub.dto.request.CreateCourseRequest;
@@ -25,6 +26,10 @@ public interface CourseService {
     Page<Course> list(Long categoryId, Long teacherId, String title, Pageable pageable);
 
     Module addModule(Long courseId, CreateModuleRequest request);
+
+    List<Module> listModules(Long courseId);
+
+    List<Lesson> listLessons(Long moduleId);
 
     Module updateModule(Long moduleId, UpdateModuleRequest request);
 
