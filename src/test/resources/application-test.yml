@@ -8,3 +8,11 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: false
+  sql:
+    init:
+      mode: never
+
+logging:
+  level:
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: OFF
+    org.hibernate.SQL: OFF
