@@ -19,5 +19,28 @@ services:
       retries: 10
     restart: unless-stopped
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: coursehub/app:0.1.0
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME:-coursehub}
+      DB_USERNAME: ${DB_USERNAME:-coursehub}
+      DB_PASSWORD: ${DB_PASSWORD:-coursehub}
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=75
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    restart: unless-stopped
+
 volumes:
   coursehub-pgdata:

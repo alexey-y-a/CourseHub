@@ -12,6 +12,10 @@ spring:
     init:
       mode: never
 
+coursehub:
+  demo:
+    enabled: false
+
 logging:
   level:
     org.hibernate.engine.jdbc.spi.SqlExceptionHelper: OFF
