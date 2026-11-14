@@ -10,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -58,7 +59,7 @@ public class UserController {
         return PageResponse.from(userService.list(role, search, pageable), UserMapper::toResponse);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @Operation(summary = "Update user")
     public UserResponse update(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
         return UserMapper.toResponse(userService.update(id, request));

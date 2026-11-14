@@ -3,10 +3,14 @@ package ru.alexey.coursehub.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,12 +19,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.alexey.coursehub.dto.request.CreateQuizRequest;
 import ru.alexey.coursehub.dto.request.SubmitQuizRequest;
+import ru.alexey.coursehub.dto.request.UpdateQuizRequest;
 import ru.alexey.coursehub.dto.response.AverageResponse;
 import ru.alexey.coursehub.dto.response.QuizResponse;
 import ru.alexey.coursehub.dto.response.QuizResultResponse;
 import ru.alexey.coursehub.mapper.AssessmentMapper;
 import ru.alexey.coursehub.service.QuizService;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Quizzes")
@@ -41,11 +47,26 @@ public class QuizController {
         return AssessmentMapper.toResponse(quizService.getWithQuestions(id));
     }
 
+    @PatchMapping("/api/quizzes/{id}")
+    @Operation(summary = "Update quiz title or time limit")
+    public QuizResponse update(@PathVariable Long id, @Valid @RequestBody UpdateQuizRequest request) {
+        return AssessmentMapper.toResponse(quizService.update(id, request));
+    }
+
+    @DeleteMapping("/api/quizzes/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete quiz without results")
+    public void delete(@PathVariable Long id) {
+        quizService.delete(id);
+    }
+
     @PostMapping("/api/quizzes/{id}/submissions")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Pass quiz and get score")
     public QuizResultResponse submit(
-            @PathVariable Long id, @RequestParam Long studentId, @Valid @RequestBody SubmitQuizRequest request) {
+            @PathVariable Long id,
+            @RequestParam @Positive Long studentId,
+            @Valid @RequestBody SubmitQuizRequest request) {
         return AssessmentMapper.toResponse(quizService.submit(id, studentId, request));
     }
 

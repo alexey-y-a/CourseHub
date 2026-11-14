@@ -1,5 +1,6 @@
 package ru.alexey.coursehub.integration;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -84,6 +85,10 @@ class ApiEndpointsIT {
                 "/api/courses",
                 "{\"title\":\"Hibernate\",\"description\":\"ORM\",\"categoryId\":" + categoryId + ",\"teacherId\":"
                         + teacherId + ",\"duration\":10,\"tags\":[\"Java\"]}"));
+        mockMvc.perform(patch("/api/courses/" + courseId).contentType(JSON).content("{\"duration\":12}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.duration").value(12));
+
         long moduleId = idOf(postJson("/api/courses/" + courseId + "/modules", "{\"title\":\"Intro\"}"));
         long lessonId = idOf(postJson("/api/modules/" + moduleId + "/lessons", "{\"title\":\"What is ORM\"}"));
         long assignmentId = idOf(
@@ -129,6 +134,34 @@ class ApiEndpointsIT {
         mockMvc.perform(get("/api/users/" + studentId + "/notifications"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    void updatesAndDeletesQuizThroughApi() throws Exception {
+        long categoryId = idOf(postJson("/api/categories", "{\"name\":\"Quiz category\"}"));
+        long teacherId = idOf(postJson(
+                "/api/users",
+                "{\"name\":\"Quiz Teacher\",\"email\":\"quiz-teacher@example.com\",\"role\":\"TEACHER\"}"));
+        long courseId = idOf(postJson(
+                "/api/courses",
+                "{\"title\":\"Quiz course\",\"categoryId\":" + categoryId + ",\"teacherId\":" + teacherId + "}"));
+        long moduleId = idOf(postJson("/api/courses/" + courseId + "/modules", "{\"title\":\"Module\"}"));
+        long quizId = idOf(postJson(
+                "/api/modules/" + moduleId + "/quiz",
+                "{\"title\":\"Quiz\",\"timeLimit\":10,\"questions\":[{\"text\":\"2+2?\","
+                        + "\"type\":\"SINGLE_CHOICE\",\"options\":[{\"text\":\"4\",\"correct\":true},"
+                        + "{\"text\":\"5\",\"correct\":false}]}]}"));
+
+        mockMvc.perform(patch("/api/quizzes/" + quizId)
+                        .contentType(JSON)
+                        .content("{\"title\":\"Renamed\",\"timeLimit\":20}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Renamed"))
+                .andExpect(jsonPath("$.timeLimit").value(20));
+
+        mockMvc.perform(delete("/api/quizzes/" + quizId)).andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/quizzes/" + quizId)).andExpect(status().isNotFound());
     }
 
     private long idOf(MockHttpServletRequestBuilder builder) throws Exception {

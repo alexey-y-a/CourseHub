@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.alexey.coursehub.dto.request.ReviewRequest;
+import ru.alexey.coursehub.dto.request.UpdateReviewRequest;
 import ru.alexey.coursehub.entity.Course;
 import ru.alexey.coursehub.entity.CourseReview;
 import ru.alexey.coursehub.entity.User;
@@ -49,6 +50,23 @@ public class ReviewServiceImpl implements ReviewService {
         CourseReview saved = courseReviewRepository.save(review);
         log.info("Student {} reviewed course {} with rating {}", studentId, courseId, request.rating());
         return saved;
+    }
+
+    @Override
+    @Transactional
+    public CourseReview update(Long id, UpdateReviewRequest request) {
+        CourseReview review =
+                courseReviewRepository.findById(id).orElseThrow(() -> NotFoundException.of("CourseReview", id));
+        if (request.rating() != null) {
+            review.setRating(request.rating());
+        }
+        if (request.comment() != null) {
+            review.setComment(request.comment());
+        }
+        review.getCourse().getId();
+        review.getStudent().getName();
+        log.info("Updated review {}", id);
+        return review;
     }
 
     @Override

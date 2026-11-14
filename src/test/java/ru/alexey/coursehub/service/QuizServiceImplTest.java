@@ -3,6 +3,8 @@ package ru.alexey.coursehub.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import ru.alexey.coursehub.dto.request.CreateOptionRequest;
 import ru.alexey.coursehub.dto.request.CreateQuestionRequest;
 import ru.alexey.coursehub.dto.request.CreateQuizRequest;
 import ru.alexey.coursehub.dto.request.SubmitQuizRequest;
+import ru.alexey.coursehub.dto.request.UpdateQuizRequest;
 import ru.alexey.coursehub.entity.AnswerOption;
 import ru.alexey.coursehub.entity.Question;
 import ru.alexey.coursehub.entity.Quiz;
@@ -26,6 +29,7 @@ import ru.alexey.coursehub.entity.User;
 import ru.alexey.coursehub.entity.enums.QuestionType;
 import ru.alexey.coursehub.entity.enums.Role;
 import ru.alexey.coursehub.exception.BadRequestException;
+import ru.alexey.coursehub.exception.ConflictException;
 import ru.alexey.coursehub.repository.ModuleRepository;
 import ru.alexey.coursehub.repository.QuizRepository;
 import ru.alexey.coursehub.repository.QuizSubmissionRepository;
@@ -138,6 +142,36 @@ class QuizServiceImplTest {
         assertThatThrownBy(() -> quizService.create(1L, request))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("exactly one correct");
+    }
+
+    @Test
+    void updatesQuizTitleAndTimeLimit() {
+        when(quizRepository.findById(1L)).thenReturn(Optional.of(quiz));
+
+        Quiz updated = quizService.update(1L, new UpdateQuizRequest("Updated", 30));
+
+        assertThat(updated.getTitle()).isEqualTo("Updated");
+        assertThat(updated.getTimeLimit()).isEqualTo(30);
+    }
+
+    @Test
+    void blocksQuizDeletionWhenResultsExist() {
+        when(quizRepository.findById(1L)).thenReturn(Optional.of(quiz));
+        when(quizSubmissionRepository.countByQuizId(1L)).thenReturn(1L);
+
+        assertThatThrownBy(() -> quizService.delete(1L)).isInstanceOf(ConflictException.class);
+
+        verify(quizRepository, never()).delete(any());
+    }
+
+    @Test
+    void deletesQuizWithoutResults() {
+        when(quizRepository.findById(1L)).thenReturn(Optional.of(quiz));
+        when(quizSubmissionRepository.countByQuizId(1L)).thenReturn(0L);
+
+        quizService.delete(1L);
+
+        verify(quizRepository).delete(quiz);
     }
 
     private void stubAttempt() {
