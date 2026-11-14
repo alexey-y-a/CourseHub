@@ -17,7 +17,7 @@
 | POST | `/api/users` | создать пользователя |
 | GET | `/api/users/{id}` | пользователь с профилем |
 | GET | `/api/users?role=&search=&page=` | список с фильтрами |
-| PUT | `/api/users/{id}` | частичное обновление |
+| PATCH | `/api/users/{id}` | частичное обновление |
 | PUT | `/api/users/{id}/profile` | создать или обновить профиль |
 | DELETE | `/api/users/{id}` | удалить |
 
@@ -39,15 +39,15 @@
 | GET | `/api/courses?categoryId=&teacherId=&title=&page=` | список с фильтрами |
 | GET | `/api/courses/{id}` | курс с тегами |
 | GET | `/api/courses/{id}/structure` | модули и уроки |
-| PUT | `/api/courses/{id}` | обновить |
+| PATCH | `/api/courses/{id}` | обновить |
 | DELETE | `/api/courses/{id}` | удалить, если нет записей |
 | POST | `/api/courses/{id}/modules` | добавить модуль |
 | GET | `/api/courses/{id}/modules` | модули курса |
-| PUT | `/api/modules/{id}` | обновить модуль |
+| PATCH | `/api/modules/{id}` | обновить модуль |
 | DELETE | `/api/modules/{id}` | удалить модуль с уроками |
 | POST | `/api/modules/{id}/lessons` | добавить урок |
 | GET | `/api/modules/{id}/lessons` | уроки модуля |
-| PUT | `/api/lessons/{id}` | обновить урок |
+| PATCH | `/api/lessons/{id}` | обновить урок |
 | DELETE | `/api/lessons/{id}` | удалить урок с заданиями |
 
 ## 5. Запись на курс
@@ -69,7 +69,7 @@
 | POST | `/api/lessons/{id}/assignments` | создать задание |
 | GET | `/api/lessons/{id}/assignments` | задания урока |
 | GET | `/api/assignments/{id}` | задание |
-| PUT | `/api/assignments/{id}` | обновить |
+| PATCH | `/api/assignments/{id}` | обновить |
 | DELETE | `/api/assignments/{id}` | удалить, если нет решений |
 | POST | `/api/assignments/{id}/submissions?studentId=` | сдать решение |
 | GET | `/api/assignments/{id}/submissions` | решения задания |
@@ -84,6 +84,8 @@
 |---|---|---|
 | POST | `/api/modules/{id}/quiz` | создать тест модуля |
 | GET | `/api/quizzes/{id}` | тест без правильных ответов |
+| PATCH | `/api/quizzes/{id}` | изменить название или лимит времени |
+| DELETE | `/api/quizzes/{id}` | удалить тест, если нет результатов |
 | POST | `/api/quizzes/{id}/submissions?studentId=` | пройти тест |
 | GET | `/api/users/{id}/quiz-results` | результаты студента |
 | GET | `/api/courses/{id}/quiz-results` | результаты по курсу |
@@ -96,6 +98,7 @@
 | POST | `/api/courses/{id}/reviews?studentId=` | оставить отзыв |
 | GET | `/api/courses/{id}/reviews?page=` | отзывы курса |
 | GET | `/api/courses/{id}/rating` | средний рейтинг |
+| PATCH | `/api/reviews/{id}` | изменить оценку или комментарий |
 | DELETE | `/api/reviews/{id}` | удалить отзыв |
 | GET | `/api/users/{id}/notifications` | уведомления |
 | GET | `/api/users/{id}/notifications/unread` | непрочитанные |

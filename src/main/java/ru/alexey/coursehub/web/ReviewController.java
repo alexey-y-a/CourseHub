@@ -3,13 +3,16 @@ package ru.alexey.coursehub.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,12 +20,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.alexey.coursehub.dto.request.ReviewRequest;
+import ru.alexey.coursehub.dto.request.UpdateReviewRequest;
 import ru.alexey.coursehub.dto.response.AverageResponse;
 import ru.alexey.coursehub.dto.response.PageResponse;
 import ru.alexey.coursehub.dto.response.ReviewResponse;
 import ru.alexey.coursehub.mapper.LearningMapper;
 import ru.alexey.coursehub.service.ReviewService;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Reviews")
@@ -34,8 +39,16 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Add course review")
     public ReviewResponse add(
-            @PathVariable Long courseId, @RequestParam Long studentId, @Valid @RequestBody ReviewRequest request) {
+            @PathVariable Long courseId,
+            @RequestParam @Positive Long studentId,
+            @Valid @RequestBody ReviewRequest request) {
         return LearningMapper.toResponse(reviewService.add(courseId, studentId, request));
+    }
+
+    @PatchMapping("/api/reviews/{id}")
+    @Operation(summary = "Update review")
+    public ReviewResponse update(@PathVariable Long id, @Valid @RequestBody UpdateReviewRequest request) {
+        return LearningMapper.toResponse(reviewService.update(id, request));
     }
 
     @GetMapping("/api/courses/{courseId}/reviews")

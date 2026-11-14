@@ -3,12 +3,14 @@ package ru.alexey.coursehub.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,6 +27,7 @@ import ru.alexey.coursehub.entity.enums.EnrollmentStatus;
 import ru.alexey.coursehub.mapper.LearningMapper;
 import ru.alexey.coursehub.service.EnrollmentService;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Enrollments")
@@ -35,7 +38,7 @@ public class EnrollmentController {
     @PostMapping("/api/courses/{courseId}/enrollments")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Enroll student in course")
-    public EnrollmentResponse enroll(@PathVariable Long courseId, @RequestParam Long studentId) {
+    public EnrollmentResponse enroll(@PathVariable Long courseId, @RequestParam @Positive Long studentId) {
         return LearningMapper.toResponse(enrollmentService.enroll(courseId, studentId));
     }
 

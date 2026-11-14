@@ -76,7 +76,8 @@ public class DemoDataInitializer implements ApplicationRunner {
 
         User admin = userService.create(new CreateUserRequest("Администратор", "admin@coursehub.example", Role.ADMIN));
         User ivan = userService.create(new CreateUserRequest("Иван Петров", "ivan@coursehub.example", Role.TEACHER));
-        User maria = userService.create(new CreateUserRequest("Мария Соколова", "maria@coursehub.example", Role.TEACHER));
+        User maria =
+                userService.create(new CreateUserRequest("Мария Соколова", "maria@coursehub.example", Role.TEACHER));
         User anna = userService.create(new CreateUserRequest("Анна Смирнова", "anna@coursehub.example", Role.STUDENT));
         User petr = userService.create(new CreateUserRequest("Пётр Кузнецов", "petr@coursehub.example", Role.STUDENT));
         User olga = userService.create(new CreateUserRequest("Ольга Иванова", "olga@coursehub.example", Role.STUDENT));
@@ -158,14 +159,18 @@ public class DemoDataInitializer implements ApplicationRunner {
         enrollmentService.enroll(springData.getId(), anna.getId());
         enrollmentService.enroll(databaseDesign.getId(), olga.getId());
 
-        Submission annaSubmission =
-                submissionService.submit(homework.getId(), anna.getId(), new SubmitAssignmentRequest(
+        Submission annaSubmission = submissionService.submit(
+                homework.getId(),
+                anna.getId(),
+                new SubmitAssignmentRequest(
                         "Customer 1-1 Profile, Course 1-M Module, Course M-M Tag через course_tag."));
-        submissionService.grade(annaSubmission.getId(), new GradeSubmissionRequest(90, "Хорошо, но не хватает примера кода."));
+        submissionService.grade(
+                annaSubmission.getId(), new GradeSubmissionRequest(90, "Хорошо, но не хватает примера кода."));
 
-        Submission petrSubmission =
-                submissionService.submit(homework.getId(), petr.getId(), new SubmitAssignmentRequest(
-                        "Сущности выделены, связи описаны, каскады не указаны."));
+        Submission petrSubmission = submissionService.submit(
+                homework.getId(),
+                petr.getId(),
+                new SubmitAssignmentRequest("Сущности выделены, связи описаны, каскады не указаны."));
         submissionService.grade(petrSubmission.getId(), new GradeSubmissionRequest(75, "Добавьте стратегии каскадов."));
 
         Quiz quiz = quizService.create(

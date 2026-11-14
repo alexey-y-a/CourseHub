@@ -10,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.alexey.coursehub.dto.request.CreateOptionRequest;
 import ru.alexey.coursehub.dto.request.CreateQuestionRequest;
 import ru.alexey.coursehub.dto.request.CreateQuizRequest;
 import ru.alexey.coursehub.dto.request.SubmitQuizRequest;
+import ru.alexey.coursehub.dto.request.UpdateQuizRequest;
 import ru.alexey.coursehub.entity.AnswerOption;
 import ru.alexey.coursehub.entity.Module;
 import ru.alexey.coursehub.entity.Question;
@@ -92,6 +94,32 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = quizRepository.findByIdWithQuestions(id).orElseThrow(() -> NotFoundException.of("Quiz", id));
         quiz.getQuestions().forEach(question -> question.getOptions().size());
         return quiz;
+    }
+
+    @Override
+    @Transactional
+    public Quiz update(Long id, UpdateQuizRequest request) {
+        Quiz quiz = quizRepository.findById(id).orElseThrow(() -> NotFoundException.of("Quiz", id));
+        if (StringUtils.hasText(request.title())) {
+            quiz.setTitle(request.title().trim());
+        }
+        if (request.timeLimit() != null) {
+            quiz.setTimeLimit(request.timeLimit());
+        }
+        quiz.getQuestions().forEach(question -> question.getOptions().size());
+        log.info("Updated quiz {}", id);
+        return quiz;
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        Quiz quiz = quizRepository.findById(id).orElseThrow(() -> NotFoundException.of("Quiz", id));
+        if (quizSubmissionRepository.countByQuizId(id) > 0) {
+            throw new ConflictException("Quiz " + id + " has results and cannot be deleted");
+        }
+        quizRepository.delete(quiz);
+        log.info("Deleted quiz {}", id);
     }
 
     @Override
