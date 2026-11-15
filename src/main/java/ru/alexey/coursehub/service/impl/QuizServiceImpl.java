@@ -29,6 +29,7 @@ import ru.alexey.coursehub.entity.enums.Role;
 import ru.alexey.coursehub.exception.BadRequestException;
 import ru.alexey.coursehub.exception.ConflictException;
 import ru.alexey.coursehub.exception.NotFoundException;
+import ru.alexey.coursehub.repository.CourseRepository;
 import ru.alexey.coursehub.repository.ModuleRepository;
 import ru.alexey.coursehub.repository.QuizRepository;
 import ru.alexey.coursehub.repository.QuizSubmissionRepository;
@@ -44,6 +45,7 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final QuizSubmissionRepository quizSubmissionRepository;
     private final ModuleRepository moduleRepository;
+    private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
 
@@ -186,18 +188,27 @@ public class QuizServiceImpl implements QuizService {
     @Override
     @Transactional(readOnly = true)
     public List<QuizSubmission> resultsByStudent(Long studentId) {
+        if (!userRepository.existsById(studentId)) {
+            throw NotFoundException.of("User", studentId);
+        }
         return quizSubmissionRepository.findByStudentIdOrderByTakenAtDesc(studentId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<QuizSubmission> resultsByCourse(Long courseId) {
+        if (!courseRepository.existsById(courseId)) {
+            throw NotFoundException.of("Course", courseId);
+        }
         return quizSubmissionRepository.findByCourseId(courseId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Double averageScore(Long quizId) {
+        if (!quizRepository.existsById(quizId)) {
+            throw NotFoundException.of("Quiz", quizId);
+        }
         return quizSubmissionRepository.findAverageScore(quizId);
     }
 

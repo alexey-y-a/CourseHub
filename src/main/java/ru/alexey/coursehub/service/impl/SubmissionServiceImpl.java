@@ -20,6 +20,7 @@ import ru.alexey.coursehub.exception.BadRequestException;
 import ru.alexey.coursehub.exception.ConflictException;
 import ru.alexey.coursehub.exception.NotFoundException;
 import ru.alexey.coursehub.repository.AssignmentRepository;
+import ru.alexey.coursehub.repository.CourseRepository;
 import ru.alexey.coursehub.repository.SubmissionRepository;
 import ru.alexey.coursehub.repository.UserRepository;
 import ru.alexey.coursehub.service.NotificationService;
@@ -33,6 +34,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     private final SubmissionRepository submissionRepository;
     private final AssignmentRepository assignmentRepository;
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
     private final NotificationService notificationService;
 
     @Override
@@ -95,18 +97,30 @@ public class SubmissionServiceImpl implements SubmissionService {
     @Override
     @Transactional(readOnly = true)
     public List<Submission> listByAssignment(Long assignmentId) {
+        if (!assignmentRepository.existsById(assignmentId)) {
+            throw NotFoundException.of("Assignment", assignmentId);
+        }
         return submissionRepository.findByAssignmentId(assignmentId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<Submission> pageByStudent(Long studentId, Pageable pageable) {
+        if (!userRepository.existsById(studentId)) {
+            throw NotFoundException.of("User", studentId);
+        }
         return submissionRepository.findByStudentId(studentId, pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Submission> listByStudentAndCourse(Long studentId, Long courseId) {
+        if (!userRepository.existsById(studentId)) {
+            throw NotFoundException.of("User", studentId);
+        }
+        if (!courseRepository.existsById(courseId)) {
+            throw NotFoundException.of("Course", courseId);
+        }
         return submissionRepository.findByStudentAndCourse(studentId, courseId);
     }
 

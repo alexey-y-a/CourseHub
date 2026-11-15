@@ -70,6 +70,9 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     @Transactional(readOnly = true)
     public List<Assignment> listByLesson(Long lessonId) {
+        if (!lessonRepository.existsById(lessonId)) {
+            throw NotFoundException.of("Lesson", lessonId);
+        }
         return assignmentRepository.findByLessonIdOrderByDueDateAsc(lessonId);
     }
 

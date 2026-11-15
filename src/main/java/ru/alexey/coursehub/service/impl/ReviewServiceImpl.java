@@ -72,12 +72,14 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional(readOnly = true)
     public Page<CourseReview> listByCourse(Long courseId, Pageable pageable) {
+        requireCourse(courseId);
         return courseReviewRepository.findByCourseId(courseId, pageable);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Double averageRating(Long courseId) {
+        requireCourse(courseId);
         return courseReviewRepository.findAverageRating(courseId);
     }
 
@@ -88,6 +90,12 @@ public class ReviewServiceImpl implements ReviewService {
                 courseReviewRepository.findById(id).orElseThrow(() -> NotFoundException.of("CourseReview", id));
         courseReviewRepository.delete(review);
         log.info("Deleted review {}", id);
+    }
+
+    private void requireCourse(Long courseId) {
+        if (!courseRepository.existsById(courseId)) {
+            throw NotFoundException.of("Course", courseId);
+        }
     }
 
     private User requireStudent(Long studentId) {
