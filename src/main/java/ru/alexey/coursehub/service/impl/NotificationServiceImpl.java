@@ -35,27 +35,37 @@ public class NotificationServiceImpl implements NotificationService {
         return saved;
     }
 
+    private void requireUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw NotFoundException.of("User", userId);
+        }
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<Notification> listByUser(Long userId) {
+        requireUser(userId);
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Notification> listUnread(Long userId) {
+        requireUser(userId);
         return notificationRepository.findByUserIdAndReadFalseOrderByCreatedAtDesc(userId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public long countUnread(Long userId) {
+        requireUser(userId);
         return notificationRepository.countByUserIdAndReadFalse(userId);
     }
 
     @Override
     @Transactional
     public int markAllRead(Long userId) {
+        requireUser(userId);
         int updated = notificationRepository.markAllReadByUserId(userId);
         log.info("Marked {} notifications as read for user {}", updated, userId);
         return updated;

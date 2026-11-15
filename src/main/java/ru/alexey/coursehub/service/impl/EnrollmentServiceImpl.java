@@ -95,6 +95,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @Transactional(readOnly = true)
     public List<Enrollment> listByCourse(Long courseId) {
+        requireCourse(courseId);
         return enrollmentRepository.findByCourseIdWithStudents(courseId);
     }
 
@@ -107,6 +108,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @Transactional(readOnly = true)
     public Page<Enrollment> pageByStudent(Long studentId, EnrollmentStatus status, Pageable pageable) {
+        requireUser(studentId);
         if (status != null) {
             return enrollmentRepository.findByStudentIdAndStatus(studentId, status, pageable);
         }
@@ -117,6 +119,18 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Transactional(readOnly = true)
     public long countByCourse(Long courseId) {
         return enrollmentRepository.countByCourseId(courseId);
+    }
+
+    private void requireCourse(Long courseId) {
+        if (!courseRepository.existsById(courseId)) {
+            throw NotFoundException.of("Course", courseId);
+        }
+    }
+
+    private void requireUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw NotFoundException.of("User", userId);
+        }
     }
 
     private User requireStudent(Long studentId) {

@@ -75,6 +75,15 @@ class ApiEndpointsIT {
     }
 
     @Test
+    void returnsNotFoundForCollectionsOfMissingParent() throws Exception {
+        mockMvc.perform(get("/api/courses/999999/enrollments")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/courses/999999/quiz-results")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/courses/999999/reviews")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/users/999999/notifications")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/assignments/999999/submissions")).andExpect(status().isNotFound());
+    }
+
+    @Test
     void runsFullLearningFlow() throws Exception {
         long categoryId = idOf(postJson("/api/categories", "{\"name\":\"Programming\"}"));
         long teacherId = idOf(
